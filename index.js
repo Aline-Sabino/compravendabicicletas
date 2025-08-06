@@ -1,6 +1,62 @@
 const form = document.getElementById("vendaForm");
 const bikeList = document.getElementById("bikeList");
 
+// Cria o card da bike
+function criarCard(nome, preco, imagem) {
+  const card = document.createElement("div");
+  card.className = "bike-card";
+
+  const img = document.createElement("img");
+  img.src = imagem;
+  img.alt = `Imagem de ${nome}`;
+  img.onerror = () => {
+    img.src = "https://via.placeholder.com/250x150?text=Imagem+Indisponível";
+  };
+
+  const h3 = document.createElement("h3");
+  h3.textContent = nome;
+
+  const p = document.createElement("p");
+  p.textContent = `R$ ${preco.toFixed(2)}`;
+
+  card.appendChild(img);
+  card.appendChild(h3);
+  card.appendChild(p);
+
+  return card;
+}
+
+// Adiciona o card na tela
+function adicionarCard(nome, preco, imagem) {
+  const card = criarCard(nome, preco, imagem);
+  bikeList.appendChild(card);
+  aplicarFiltros();
+  salvarLista();
+}
+
+// Salva no localStorage
+function salvarLista() {
+  const cards = document.querySelectorAll(".bike-card");
+  const lista = [];
+
+  cards.forEach(card => {
+    const nome = card.querySelector("h3").textContent;
+    const preco = parseFloat(card.querySelector("p").textContent.replace("R$", "").replace(",", "."));
+    const imagem = card.querySelector("img").src;
+
+    lista.push({ nome, preco, imagem });
+  });
+
+  localStorage.setItem("bicicletas", JSON.stringify(lista));
+}
+
+// Carrega do localStorage
+function carregarLista() {
+  const dados = JSON.parse(localStorage.getItem("bicicletas")) || [];
+  dados.forEach(bike => adicionarCard(bike.nome, bike.preco, bike.imagem));
+}
+
+// Submissão do formulário
 form.addEventListener("submit", function (e) {
   e.preventDefault();
 
@@ -8,22 +64,13 @@ form.addEventListener("submit", function (e) {
   const preco = parseFloat(document.getElementById("preco").value);
   const imagem = document.getElementById("imagem").value.trim();
 
-  if (!nome || preco <= 0 || !imagem) {
+  if (!nome || isNaN(preco) || preco <= 0 || !imagem) {
     alert("Preencha os campos corretamente.");
     return;
   }
 
-  const card = document.createElement("div");
-  card.className = "bike-card";
-  card.innerHTML = `
-    <img src="${imagem}" alt="Imagem de ${nome}">
-    <h3>${nome}</h3>
-    <p>R$ ${preco.toFixed(2)}</p>
-  `;
-
-  bikeList.appendChild(card);
+  adicionarCard(nome, preco, imagem);
   form.reset();
-  aplicarFiltros(); // Atualiza filtro ao adicionar
 });
 
 // Filtros
@@ -37,17 +84,4 @@ function aplicarFiltros() {
   const min = parseFloat(filtroMin.value) || 0;
   const max = parseFloat(filtroMax.value) || Infinity;
 
-  cards.forEach(card => {
-    const nome = card.querySelector("h3").textContent.toLowerCase();
-    const preco = parseFloat(card.querySelector("p").textContent.replace("R$", "").replace(",", "."));
-
-    const nomeOK = nome.includes(nomeFiltro);
-    const precoOK = preco >= min && preco <= max;
-
-    card.style.display = nomeOK && precoOK ? "" : "none";
-  });
-}
-
-filtroNome.addEventListener("input", aplicarFiltros);
-filtroMin.addEventListener("input", aplicarFiltros);
-filtroMax.addEventListener("input", aplicarFiltros);
+  let visiveis = 0;
