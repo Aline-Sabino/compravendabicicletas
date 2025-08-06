@@ -85,3 +85,4 @@ function aplicarFiltros() {
   const max = parseFloat(filtroMax.value) || Infinity;
 
   let visiveis = 0;
+}
