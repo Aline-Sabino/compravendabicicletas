@@ -1,10 +1,11 @@
 const form = document.getElementById("vendaForm");
 const bikeList = document.getElementById("bikeList");
+const mensagemVazia = document.querySelector(".mensagem-vazia");
 
-// Cria o card da bike
+// Criar card da bike
 function criarCard(nome, preco, imagem) {
   const card = document.createElement("div");
-  card.className = "bike-card";
+  card.className = "bike-card fade-in";
 
   const img = document.createElement("img");
   img.src = imagem;
@@ -19,14 +20,21 @@ function criarCard(nome, preco, imagem) {
   const p = document.createElement("p");
   p.textContent = `R$ ${preco.toFixed(2)}`;
 
-  card.appendChild(img);
-  card.appendChild(h3);
-  card.appendChild(p);
+  // Botão de remover
+  const btnRemover = document.createElement("button");
+  btnRemover.textContent = "Remover";
+  btnRemover.className = "btn-remover";
+  btnRemover.addEventListener("click", () => {
+    card.remove();
+    salvarLista();
+    aplicarFiltros();
+  });
 
+  card.append(img, h3, p, btnRemover);
   return card;
 }
 
-// Adiciona o card na tela
+// Adicionar card
 function adicionarCard(nome, preco, imagem) {
   const card = criarCard(nome, preco, imagem);
   bikeList.appendChild(card);
@@ -34,30 +42,26 @@ function adicionarCard(nome, preco, imagem) {
   salvarLista();
 }
 
-// Salva no localStorage
+// Salvar no localStorage
 function salvarLista() {
-  const cards = document.querySelectorAll(".bike-card");
-  const lista = [];
-
-  cards.forEach(card => {
-    const nome = card.querySelector("h3").textContent;
-    const preco = parseFloat(card.querySelector("p").textContent.replace("R$", "").replace(",", "."));
-    const imagem = card.querySelector("img").src;
-
-    lista.push({ nome, preco, imagem });
+  const lista = [...document.querySelectorAll(".bike-card")].map(card => {
+    return {
+      nome: card.querySelector("h3").textContent,
+      preco: parseFloat(card.querySelector("p").textContent.replace("R$", "").replace(",", ".")),
+      imagem: card.querySelector("img").src
+    };
   });
-
   localStorage.setItem("bicicletas", JSON.stringify(lista));
 }
 
-// Carrega do localStorage
+// Carregar lista
 function carregarLista() {
   const dados = JSON.parse(localStorage.getItem("bicicletas")) || [];
   dados.forEach(bike => adicionarCard(bike.nome, bike.preco, bike.imagem));
 }
 
 // Submissão do formulário
-form.addEventListener("submit", function (e) {
+form.addEventListener("submit", e => {
   e.preventDefault();
 
   const nome = document.getElementById("nome").value.trim();
@@ -85,4 +89,23 @@ function aplicarFiltros() {
   const max = parseFloat(filtroMax.value) || Infinity;
 
   let visiveis = 0;
+
+  cards.forEach(card => {
+    const nome = card.querySelector("h3").textContent.toLowerCase();
+    const preco = parseFloat(card.querySelector("p").textContent.replace("R$", "").replace(",", "."));
+    const corresponde = nome.includes(nomeFiltro) && preco >= min && preco <= max;
+
+    card.style.display = corresponde ? "block" : "none";
+    if (corresponde) visiveis++;
+  });
+
+  mensagemVazia.style.display = visiveis === 0 ? "block" : "none";
 }
+
+// Eventos de filtro
+[filtroNome, filtroMin, filtroMax].forEach(input => {
+  input.addEventListener("input", aplicarFiltros);
+});
+
+// Inicia
+carregarLista();
