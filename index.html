@@ -1,42 +1,42 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bike Market</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
     <h1>🚴 Bike Market</h1>
-    <nav>
-      <a href="#comprar">Comprar</a>
-      <a href="#vender">Vender</a>
-    </nav>
+    <p>Compre e venda bicicletas facilmente</p>
   </header>
 
   <main>
-    <section id="comprar">
-      <h2>Bicicletas à Venda</h2>
-
-      <div id="filtro">
-        <input type="text" id="filtroNome" placeholder="Filtrar por nome" />
-        <input type="number" id="filtroMin" placeholder="Preço mínimo (R$)" />
-        <input type="number" id="filtroMax" placeholder="Preço máximo (R$)" />
-      </div>
-
-      <div class="bike-list" id="bikeList"></div>
-      <p id="semResultados" class="mensagem-vazia">Nenhuma bicicleta encontrada.</p>
-    </section>
-
-    <section id="vender">
-      <h2>Cadastre sua Bicicleta</h2>
+    <!-- Formulário de cadastro -->
+    <section class="form-section">
+      <h2>Cadastrar Bicicleta</h2>
       <form id="vendaForm">
-        <input type="text" id="nome" placeholder="Nome da bicicleta" required />
-        <input type="number" id="preco" placeholder="Preço (R$)" required />
-        <input type="text" id="imagem" placeholder="URL da imagem" required />
+        <input type="text" id="nome" placeholder="Nome da bicicleta" required>
+        <input type="number" id="preco" placeholder="Preço" required>
+        <input type="text" id="tipo" placeholder="Tipo (MTB, Speed...)" required>
+        <input type="text" id="imagem" placeholder="URL da imagem" required>
         <button type="submit">Cadastrar</button>
       </form>
+    </section>
+
+    <!-- Filtros (mantidos na posição original) -->
+    <section class="filter-section">
+      <input type="text" id="filterName" placeholder="Filtrar por nome">
+      <input type="number" id="filterPrice" placeholder="Preço máximo">
+      <button type="button" id="applyFilter">Filtrar</button>
+      <button type="button" id="clearFilter">Limpar</button>
+    </section>
+
+    <!-- Lista de bicicletas -->
+    <section class="list-section">
+      <h2>Lista de Bicicletas</h2>
+      <div id="bikeList" class="bike-list"></div>
     </section>
   </main>
 
